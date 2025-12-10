@@ -6,6 +6,7 @@ import 'package:args/args.dart';
 import 'package:maloc_cli/commands/create_feature_command.dart';
 import 'package:maloc_cli/commands/create_project_command.dart';
 import 'package:maloc_cli/commands/init_project_command.dart';
+import 'package:maloc_cli/commands/pub_get_command.dart';
 import 'package:maloc_cli/commands/remove_feature_command.dart';
 
 void main(List<String> arguments) async {
@@ -19,6 +20,10 @@ void main(List<String> arguments) async {
 
   // Add init project command
   parser.addCommand('init');
+
+  // Add pub get command
+  final pubParser = ArgParser();
+  parser.addCommand('pub', pubParser);
 
   // Add feature command with options
   final featureParser = ArgParser()
@@ -57,6 +62,17 @@ void main(List<String> arguments) async {
       case 'init':
         final targetPath = command.rest.isNotEmpty ? command.rest.first : null;
         await InitProjectCommand(targetPath).execute();
+        break;
+      case 'pub':
+        final subCommand = command.rest.isNotEmpty ? command.rest.first : null;
+        if (subCommand == 'get') {
+          final targetPath = command.rest.length > 1 ? command.rest[1] : null;
+          await PubGetCommand(targetPath).execute();
+        } else {
+          print('❌ Error: Unknown pub command: $subCommand');
+          print('Usage: maloc pub get [path]');
+          exit(1);
+        }
         break;
       case 'feature':
         final featureName = command['name'] ??
@@ -103,6 +119,7 @@ Usage: maloc <command> [arguments]
 Commands:
   create <project-name>      Create a new Flutter project with Clean Architecture
   init [path]                Initialize template in current or specified directory
+  pub get [path]             Install dependencies for all packages in project
   feature <feature-name>     Generate a new feature module in existing project
   remove <feature-name>      Remove an existing feature module
 
@@ -113,6 +130,12 @@ Options:
 Examples:
   # Create a new project
   maloc create my_awesome_app
+
+  # Initialize in current directory
+  maloc init
+
+  # Install all dependencies
+  maloc pub get
 
   # Add a feature to existing project
   maloc feature products
