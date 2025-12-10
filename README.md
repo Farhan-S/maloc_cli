@@ -15,13 +15,46 @@ A powerful CLI tool for scaffolding Flutter projects with Clean Architecture, Me
 
 ## Installation
 
-Install globally using pub:
+### Option 1: Install from pub.dev (Recommended)
+
+Once published on pub.dev, install globally:
 
 ```bash
 dart pub global activate maloc_cli
 ```
 
-Make sure `~/.pub-cache/bin` is in your PATH.
+### Option 2: Install from GitHub
+
+Install directly from the GitHub repository:
+
+```bash
+dart pub global activate --source git https://github.com/Farhan-S/maloc_cli.git
+```
+
+### Option 3: Install from Local Clone
+
+Clone the repository and install from source:
+
+```bash
+# Clone the repository
+git clone https://github.com/Farhan-S/maloc_cli.git
+cd maloc_cli
+
+# Install dependencies
+dart pub get
+
+# Activate globally from local source
+dart pub global activate --source path .
+```
+
+### Verify Installation
+
+Make sure `~/.pub-cache/bin` is in your PATH, then verify:
+
+```bash
+maloc --version
+maloc --help
+```
 
 ## Usage
 
@@ -34,6 +67,7 @@ maloc create my_awesome_app
 ```
 
 This will:
+
 - Clone the template from GitHub
 - Set up the project structure
 - Configure package names
@@ -54,6 +88,7 @@ maloc init /path/to/my_project
 ```
 
 This is useful when:
+
 - You want to set up the template in an existing directory
 - You've already created a directory and want to initialize it
 - You want to specify a custom path
@@ -67,6 +102,7 @@ maloc feature products
 ```
 
 This creates:
+
 - Presentation layer (BLoC, Pages, Widgets)
 - Domain layer (Entities, Use Cases, Repository Interface)
 - Data layer (Models, Data Sources, Repository Implementation)
@@ -80,6 +116,38 @@ maloc remove products
 ```
 
 This removes all feature files and cleans up dependencies.
+
+### Install Dependencies
+
+Install dependencies for all packages in your monorepo:
+
+```bash
+maloc pub get
+```
+
+This will run `dart pub get` for all packages in the project.
+
+## Updating Maloc CLI
+
+### If installed from pub.dev:
+
+```bash
+dart pub global activate maloc_cli
+```
+
+### If installed from GitHub:
+
+```bash
+dart pub global activate --source git https://github.com/Farhan-S/maloc_cli.git
+```
+
+### If installed from local source:
+
+```bash
+cd /path/to/maloc_cli
+git pull
+dart pub global activate --source path .
+```
 
 ## Project Structure
 
@@ -104,11 +172,13 @@ my_project/
 To publish this CLI to pub.dev:
 
 1. Make sure your package is ready:
+
 ```bash
 dart pub publish --dry-run
 ```
 
 2. Publish to pub.dev:
+
 ```bash
 dart pub publish
 ```
@@ -119,16 +189,19 @@ To work on this CLI locally:
 
 1. Clone the repository
 2. Install dependencies:
+
 ```bash
 dart pub get
 ```
 
 3. Run locally:
+
 ```bash
 dart run bin/maloc.dart <command>
 ```
 
 4. Test the global installation:
+
 ```bash
 dart pub global activate --source path .
 ```
