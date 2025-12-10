@@ -1,5 +1,6 @@
 class BlocGenerator {
-  static Map<String, String> generate(String snakeName, String pascalName, String camelName) {
+  static Map<String, String> generate(
+      String snakeName, String pascalName, String camelName) {
     return {
       'bloc': _generateBloc(snakeName, pascalName, camelName),
       'event': _generateEvent(snakeName, pascalName),
@@ -7,7 +8,8 @@ class BlocGenerator {
     };
   }
 
-  static String _generateBloc(String snakeName, String pascalName, String camelName) {
+  static String _generateBloc(
+      String snakeName, String pascalName, String camelName) {
     return '''import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/get_${snakeName}_usecase.dart';
 import '${snakeName}_event.dart';
@@ -61,7 +63,8 @@ class Get${pascalName}Event extends ${pascalName}Event {
 ''';
   }
 
-  static String _generateState(String snakeName, String pascalName, String camelName) {
+  static String _generateState(
+      String snakeName, String pascalName, String camelName) {
     return '''import 'package:equatable/equatable.dart';
 import '../../domain/entities/${snakeName}_entity.dart';
 

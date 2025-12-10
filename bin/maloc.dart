@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:args/args.dart';
 import 'package:maloc_cli/commands/create_project_command.dart';
+import 'package:maloc_cli/commands/init_project_command.dart';
 import 'package:maloc_cli/commands/create_feature_command.dart';
 import 'package:maloc_cli/commands/remove_feature_command.dart';
 
@@ -15,6 +16,9 @@ void main(List<String> arguments) async {
 
   // Add create project command
   parser.addCommand('create');
+
+  // Add init project command
+  parser.addCommand('init');
 
   // Add feature command with options
   final featureParser = ArgParser()
@@ -35,7 +39,7 @@ void main(List<String> arguments) async {
     }
 
     if (results['version'] as bool) {
-      print('Maloc CLI version 1.0.0');
+      print('Maloc CLI version 1.1.0');
       return;
     }
 
@@ -50,8 +54,13 @@ void main(List<String> arguments) async {
         final projectName = command.rest.isNotEmpty ? command.rest.first : null;
         await CreateProjectCommand(projectName).execute();
         break;
+      case 'init':
+        final targetPath = command.rest.isNotEmpty ? command.rest.first : null;
+        await InitProjectCommand(targetPath).execute();
+        break;
       case 'feature':
-        final featureName = command['name'] ?? (command.rest.isNotEmpty ? command.rest.first : null);
+        final featureName = command['name'] ??
+            (command.rest.isNotEmpty ? command.rest.first : null);
         if (featureName == null) {
           print('❌ Error: Please provide a feature name');
           print('Usage: maloc feature <feature-name>');
@@ -61,7 +70,8 @@ void main(List<String> arguments) async {
         await CreateFeatureCommand(featureName).execute();
         break;
       case 'remove':
-        final featureName = command['name'] ?? (command.rest.isNotEmpty ? command.rest.first : null);
+        final featureName = command['name'] ??
+            (command.rest.isNotEmpty ? command.rest.first : null);
         if (featureName == null) {
           print('❌ Error: Please provide a feature name');
           print('Usage: maloc remove <feature-name>');
@@ -92,6 +102,7 @@ Usage: maloc <command> [arguments]
 
 Commands:
   create <project-name>      Create a new Flutter project with Clean Architecture
+  init [path]                Initialize template in current or specified directory
   feature <feature-name>     Generate a new feature module in existing project
   remove <feature-name>      Remove an existing feature module
 

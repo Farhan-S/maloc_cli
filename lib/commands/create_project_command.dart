@@ -95,7 +95,8 @@ class CreateProjectCommand {
       if (bootstrapResult.exitCode == 0) {
         Logger.success('Dependencies installed');
       } else {
-        Logger.warning('Some dependencies failed to install. You can run "dart bootstrap.dart" later.');
+        Logger.warning(
+            'Some dependencies failed to install. You can run "dart bootstrap.dart" later.');
       }
 
       // Step 6: Initial git commit
@@ -207,10 +208,10 @@ ${Logger.green}Happy coding! 🚀${Logger.reset}
     }
   }
 
-  Future<void> _updateIOSBundleId(String projectName, String packageName) async {
+  Future<void> _updateIOSBundleId(
+      String projectName, String packageName) async {
     // Update Info.plist if needed
-    final infoPlist =
-        File('$projectName/packages/app/ios/Runner/Info.plist');
+    final infoPlist = File('$projectName/packages/app/ios/Runner/Info.plist');
     if (infoPlist.existsSync()) {
       var content = infoPlist.readAsStringSync();
       content = content.replaceAll(
