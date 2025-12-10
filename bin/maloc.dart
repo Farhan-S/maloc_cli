@@ -3,9 +3,9 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:maloc_cli/commands/create_feature_command.dart';
 import 'package:maloc_cli/commands/create_project_command.dart';
 import 'package:maloc_cli/commands/init_project_command.dart';
-import 'package:maloc_cli/commands/create_feature_command.dart';
 import 'package:maloc_cli/commands/remove_feature_command.dart';
 
 void main(List<String> arguments) async {
