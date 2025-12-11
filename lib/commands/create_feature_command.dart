@@ -120,7 +120,8 @@ class CreateFeatureCommand {
         blocFiles['state']!);
     Logger.success('Generated BLoC files');
 
-    final pageContent = PageGenerator.generate(snakeName, pascalName);
+    final pageContent =
+        PageGenerator.generate(snakeName, pascalName, camelName);
     _writeFile('$featurePath/lib/presentation/pages/${snakeName}_page.dart',
         pageContent);
     Logger.success('Generated page');
@@ -130,13 +131,13 @@ class CreateFeatureCommand {
 
     // Add route to app_routes.dart
     Logger.step('Adding route to app_routes.dart...');
-    _addRouteToAppRoutes(snakeName, camelName);
+    _addRouteToAppRoutes(snakeName, camelName, pascalName);
     Logger.success('Route added to app_routes.dart');
 
-    // Register route in app_route_generator.dart
-    Logger.step('Registering route in app_route_generator.dart...');
-    _registerRouteInGenerator(snakeName, pascalName, camelName);
-    Logger.success('Route registered in app_route_generator.dart');
+    // Register route in app_router.dart (go_router)
+    Logger.step('Registering route in app_router.dart...');
+    _registerRouteInAppRouter(snakeName, pascalName, camelName);
+    Logger.success('Route registered in app_router.dart');
 
     // Add to app/pubspec.yaml
     Logger.step('Adding dependency to app/pubspec.yaml...');
@@ -179,7 +180,7 @@ ${_green}✨ What was done automatically:$_reset
    • Added dependency to app/pubspec.yaml
    • Installed all feature dependencies
    • Registered routes in app_routes.dart
-   • Registered routes in app_route_generator.dart
+   • Registered GoRoute in app_router.dart
 
 Feature location: ${_green}$featurePath$_reset
 ''');
@@ -207,7 +208,8 @@ Feature location: ${_green}$featurePath$_reset
     File(path).writeAsStringSync(content);
   }
 
-  void _addRouteToAppRoutes(String snakeName, String camelName) {
+  void _addRouteToAppRoutes(
+      String snakeName, String camelName, String pascalName) {
     final currentDir = Directory.current.path;
     final appRoutesPath = currentDir.endsWith('packages')
         ? '$currentDir/core/lib/src/routes/app_routes.dart'
@@ -220,16 +222,14 @@ Feature location: ${_green}$featurePath$_reset
     }
 
     String content = appRoutesFile.readAsStringSync();
-    final pascalName = snakeName
-        .split('_')
-        .map((w) => w[0].toUpperCase() + w.substring(1))
-        .join('');
-    bool routeExists = content.contains("static const String $camelName =");
+    bool routeNameExists = content.contains("static const String $camelName =");
+    bool routePathExists =
+        content.contains("static const String ${camelName}Path =");
     bool navHelperExists = content.contains("navigateTo$pascalName(");
 
-    // Add route constant if not exists
-    if (!routeExists) {
-      final insertPattern = "static const String settings = '/settings';";
+    // Add route name constant if not exists (in Route Names section)
+    if (!routeNameExists) {
+      final insertPattern = "static const String settings = 'settings';";
       final insertIndex = content.indexOf(insertPattern);
 
       if (insertIndex != -1) {
@@ -241,27 +241,47 @@ Feature location: ${_green}$featurePath$_reset
             .map((w) => w[0].toUpperCase() + w.substring(1))
             .join(' ');
         final newRoute =
-            "\n  // $featureTitle Routes\n  static const String $camelName = '/$snakeName';\n";
+            "\n  // $featureTitle Routes\n  static const String $camelName = '$snakeName';\n";
 
         content = content.substring(0, insertPosition) +
             newRoute +
             content.substring(insertPosition);
       } else {
         Logger.warning(
-            'Could not find insertion point for route constant in app_routes.dart');
-        return;
+            'Could not find insertion point for route name in app_routes.dart');
       }
     }
 
-    // Add navigation helper if not exists
+    // Add route path constant if not exists (in Route Paths section)
+    if (!routePathExists) {
+      final insertPattern = "static const String settingsPath = '/settings';";
+      final insertIndex = content.indexOf(insertPattern);
+
+      if (insertIndex != -1) {
+        final lineEnd = content.indexOf('\n', insertIndex);
+        final insertPosition = lineEnd + 1;
+
+        final newPath =
+            "  static const String ${camelName}Path = '/$snakeName';\n";
+
+        content = content.substring(0, insertPosition) +
+            newPath +
+            content.substring(insertPosition);
+      } else {
+        Logger.warning(
+            'Could not find insertion point for route path in app_routes.dart');
+      }
+    }
+
+    // Add navigation helper if not exists (in Navigation Helpers section)
     if (!navHelperExists) {
       final navigationHelperPattern =
-          "/// Navigate back\n  static void navigateBack(BuildContext context) {";
+          "/// Navigate to settings page\n  static void navigateToSettings(BuildContext context) {";
       final navHelperIndex = content.indexOf(navigationHelperPattern);
 
       if (navHelperIndex != -1) {
         final navigationHelper =
-            "\n  /// Navigate to $snakeName page\n  static Future<void> navigateTo$pascalName(BuildContext context) {\n    return Navigator.pushNamed(context, $camelName);\n  }\n\n";
+            "\n  /// Navigate to $snakeName page\n  static void navigateTo$pascalName(BuildContext context) {\n    context.push(${camelName}Path);\n  }\n";
 
         content = content.substring(0, navHelperIndex) +
             navigationHelper +
@@ -273,36 +293,33 @@ Feature location: ${_green}$featurePath$_reset
     }
 
     // Write updated content
-    if (!routeExists || !navHelperExists) {
+    if (!routeNameExists || !routePathExists || !navHelperExists) {
       appRoutesFile.writeAsStringSync(content);
     } else {
-      Logger.warning(
-          'Route $camelName and navigation helper already exist in app_routes.dart');
+      Logger.warning('Route $camelName already exists in app_routes.dart');
     }
   }
 
-  void _registerRouteInGenerator(
+  void _registerRouteInAppRouter(
       String snakeName, String pascalName, String camelName) {
     try {
       final currentDir = Directory.current.path;
-      final routeGeneratorPath = currentDir.endsWith('packages')
-          ? '$currentDir/app/lib/routes/app_route_generator.dart'
-          : '$currentDir/packages/app/lib/routes/app_route_generator.dart';
+      final appRouterPath = currentDir.endsWith('packages')
+          ? '$currentDir/app/lib/routes/app_router.dart'
+          : '$currentDir/packages/app/lib/routes/app_router.dart';
 
-      final routeGeneratorFile = File(routeGeneratorPath);
-      if (!routeGeneratorFile.existsSync()) {
-        Logger.warning(
-            'app_route_generator.dart not found at $routeGeneratorPath');
+      final appRouterFile = File(appRouterPath);
+      if (!appRouterFile.existsSync()) {
+        Logger.warning('app_router.dart not found at $appRouterPath');
         return;
       }
 
-      String content = routeGeneratorFile.readAsStringSync();
-      bool wasModified = false;
+      String content = appRouterFile.readAsStringSync();
 
       // Check if route already registered
-      if (content.contains("case AppRoutes.$camelName:")) {
+      if (content.contains("path: AppRoutes.${camelName}Path")) {
         Logger.warning(
-            'Route $camelName already registered in switch statement');
+            'Route $camelName already registered in app_router.dart');
         return;
       }
 
@@ -321,88 +338,51 @@ Feature location: ${_green}$featurePath$_reset
           content = content.substring(0, importInsertPosition) +
               featureImport +
               content.substring(importInsertPosition);
-          wasModified = true;
         }
       } else {
-        Logger.warning(
-            'Could not find import section in app_route_generator.dart');
+        Logger.warning('Could not find import section in app_router.dart');
+        return;
       }
 
-      // 2. Add case to switch statement
-      final switchInsertPattern = "case AppRoutes.login:";
-      final switchIndex = content.indexOf(switchInsertPattern);
+      // 2. Add GoRoute to routes list (before the closing ],)
+      // Find the end of routes array by looking for the pattern "      ],\n    );\n  }"
+      final routesEndPattern = '      ],';
+      final routesEndIndex = content.lastIndexOf(routesEndPattern);
 
-      if (switchIndex != -1) {
-        // Find the end of the login case
-        final loginCaseEnd = content.indexOf("default:", switchIndex);
+      if (routesEndIndex != -1) {
+        final insertPosition = routesEndIndex;
 
-        if (loginCaseEnd != -1) {
-          final newCase = '''
+        final featureTitle = snakeName
+            .split('_')
+            .map((w) => w[0].toUpperCase() + w.substring(1))
+            .join(' ');
 
-      case AppRoutes.$camelName:
-        return _createRoute(
-          BlocProvider(
-            create: (_) => getIt<${pascalName}Bloc>(),
-            child: const ${pascalName}Page(),
+        final newRoute = '''
+        // ==================== $featureTitle Routes ====================
+        GoRoute(
+          path: AppRoutes.${camelName}Path,
+          name: AppRoutes.$camelName,
+          pageBuilder: (context, state) => _buildPageWithTransition(
+            key: state.pageKey,
+            child: BlocProvider(
+              create: (_) => getIt<${pascalName}Bloc>(),
+              child: const ${pascalName}Page(),
+            ),
           ),
-          settings,
-        );
+        ),
+
 ''';
 
-          content = content.substring(0, loginCaseEnd) +
-              newCase +
-              '\n      ' +
-              content.substring(loginCaseEnd);
-          wasModified = true;
-        } else {
-          Logger.warning('Could not find default case in switch statement');
-        }
+        content = content.substring(0, insertPosition) +
+            newRoute +
+            content.substring(insertPosition);
+
+        appRouterFile.writeAsStringSync(content);
       } else {
-        Logger.warning('Could not find login case in switch statement');
-      }
-
-      // 3. Add route registration in registerAllRoutes method
-      final registerRoutesPattern =
-          "// Auth routes can be registered similarly\n    AppRouteRegistry.registerRoute(";
-      final registerIndex = content.indexOf(registerRoutesPattern);
-
-      if (registerIndex != -1) {
-        // Find the end of login route registration
-        final loginRegisterEnd = content.indexOf(");", registerIndex);
-        if (loginRegisterEnd != -1) {
-          final semicolonEnd = content.indexOf(";", loginRegisterEnd);
-          final insertPosition = semicolonEnd + 1;
-
-          final newRegistration = '''
-    
-    // ${pascalName} route
-    AppRouteRegistry.registerRoute(
-      AppRoutes.$camelName,
-      (settings) => MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => getIt<${pascalName}Bloc>(),
-          child: const ${pascalName}Page(),
-        ),
-        settings: settings,
-      ),
-    );''';
-
-          content = content.substring(0, insertPosition) +
-              newRegistration +
-              content.substring(insertPosition);
-          wasModified = true;
-        } else {
-          Logger.warning('Could not find login route registration end');
-        }
-      } else {
-        Logger.warning('Could not find route registration section');
-      }
-
-      if (wasModified) {
-        routeGeneratorFile.writeAsStringSync(content);
+        Logger.warning('Could not find routes array end in app_router.dart');
       }
     } catch (e) {
-      Logger.error('Error registering route in app_route_generator.dart: $e');
+      Logger.error('Error registering route in app_router.dart: $e');
     }
   }
 

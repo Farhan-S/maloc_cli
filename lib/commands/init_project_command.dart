@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:maloc_cli/utils/logger.dart';
+import '../utils/logger.dart';
 
 class InitProjectCommand {
   final String? targetPath;
@@ -15,8 +15,9 @@ class InitProjectCommand {
     final targetDir = Directory(target);
 
     // Get project name from directory name
-    final projectName =
-        targetDir.absolute.path.split(Platform.pathSeparator).last;
+    final projectName = targetDir.absolute.path
+        .split(Platform.pathSeparator)
+        .last;
 
     // Check if directory exists, create if not
     if (!targetDir.existsSync()) {
@@ -54,15 +55,12 @@ class InitProjectCommand {
       Logger.step('Downloading template from GitHub...');
       final tempDir = Directory('${targetDir.path}/.maloc_temp');
 
-      final cloneResult = await Process.run(
-        'git',
-        [
-          'clone',
-          '--depth=1',
-          'https://github.com/Farhan-S/flutter_monorepo_clean_architecture.git',
-          tempDir.path,
-        ],
-      );
+      final cloneResult = await Process.run('git', [
+        'clone',
+        '--depth=1',
+        'https://github.com/Farhan-S/flutter_monorepo_clean_architecture.git',
+        tempDir.path,
+      ]);
 
       if (cloneResult.exitCode != 0) {
         Logger.error('Failed to download template repository');
@@ -92,37 +90,46 @@ class InitProjectCommand {
       // Step 5: Update pubspec.yaml files
       Logger.step('Updating project configuration...');
       await _updatePubspecFiles(
-          targetDir.path, projectName, packageName, description);
+        targetDir.path,
+        projectName,
+        packageName,
+        description,
+      );
       Logger.success('Configuration updated');
 
       // Step 6: Run melos bootstrap
       Logger.step('Installing dependencies (this may take a while)...');
       final bootstrapFile = File('${targetDir.path}/bootstrap.dart');
       if (bootstrapFile.existsSync()) {
-        final bootstrapResult = await Process.run(
-          'dart',
-          ['bootstrap.dart'],
-          workingDirectory: targetDir.path,
-        );
+        final bootstrapResult = await Process.run('dart', [
+          'bootstrap.dart',
+        ], workingDirectory: targetDir.path);
 
         if (bootstrapResult.exitCode == 0) {
           Logger.success('Dependencies installed');
         } else {
           Logger.warning(
-              'Some dependencies failed to install. You can run "dart bootstrap.dart" later.');
+            'Some dependencies failed to install. You can run "dart bootstrap.dart" later.',
+          );
         }
       } else {
         Logger.warning(
-            'bootstrap.dart not found. Skipping dependency installation.');
+          'bootstrap.dart not found. Skipping dependency installation.',
+        );
       }
 
       // Step 7: Initial git commit (if new repo)
       if (!gitDir.existsSync() || (await _isGitRepoEmpty(targetDir.path))) {
         Logger.step('Creating initial commit...');
-        await Process.run('git', ['add', '.'],
-            workingDirectory: targetDir.path);
-        await Process.run('git', ['commit', '-m', 'Initial commit'],
-            workingDirectory: targetDir.path);
+        await Process.run('git', [
+          'add',
+          '.',
+        ], workingDirectory: targetDir.path);
+        await Process.run('git', [
+          'commit',
+          '-m',
+          'Initial commit',
+        ], workingDirectory: targetDir.path);
         Logger.success('Initial commit created');
       }
 
@@ -223,10 +230,7 @@ ${Logger.green}Happy coding! 🚀${Logger.reset}
     final appPubspec = File('$projectPath/packages/app/pubspec.yaml');
     if (appPubspec.existsSync()) {
       var content = appPubspec.readAsStringSync();
-      content = content.replaceAll(
-        'name: app',
-        'name: $projectName',
-      );
+      content = content.replaceAll('name: app', 'name: $projectName');
       content = content.replaceAll(
         'description: Main application package',
         'description: $description',
@@ -245,8 +249,9 @@ ${Logger.green}Happy coding! 🚀${Logger.reset}
     String projectPath,
     String packageName,
   ) async {
-    final buildGradle =
-        File('$projectPath/packages/app/android/app/build.gradle');
+    final buildGradle = File(
+      '$projectPath/packages/app/android/app/build.gradle',
+    );
     if (buildGradle.existsSync()) {
       var content = buildGradle.readAsStringSync();
       content = content.replaceAll(
@@ -258,25 +263,24 @@ ${Logger.green}Happy coding! 🚀${Logger.reset}
   }
 
   Future<void> _updateIOSBundleId(
-      String projectPath, String packageName) async {
+    String projectPath,
+    String packageName,
+  ) async {
     // Update Info.plist if needed
     final infoPlist = File('$projectPath/packages/app/ios/Runner/Info.plist');
     if (infoPlist.existsSync()) {
       var content = infoPlist.readAsStringSync();
-      content = content.replaceAll(
-        'com.example.app',
-        packageName,
-      );
+      content = content.replaceAll('com.example.app', packageName);
       infoPlist.writeAsStringSync(content);
     }
   }
 
   Future<bool> _isGitRepoEmpty(String path) async {
-    final result = await Process.run(
-      'git',
-      ['rev-list', '--all', '--count'],
-      workingDirectory: path,
-    );
+    final result = await Process.run('git', [
+      'rev-list',
+      '--all',
+      '--count',
+    ], workingDirectory: path);
     return result.stdout.toString().trim() == '0';
   }
 }

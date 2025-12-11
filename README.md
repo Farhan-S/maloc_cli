@@ -103,9 +103,19 @@ maloc feature products
 
 This creates:
 
-- Presentation layer (BLoC, Pages, Widgets)
-- Domain layer (Entities, Use Cases, Repository Interface)
-- Data layer (Models, Data Sources, Repository Implementation)
+- **Presentation layer**: BLoC (events, states, bloc), Pages, Widgets
+- **Domain layer**: Entities, Use Cases, Repository Interface
+- **Data layer**: Models, Data Sources, Repository Implementation
+- **Automatic routing**: Adds route constants to `app_routes.dart` and GoRoute to `app_router.dart`
+- **Navigation helpers**: Generates `navigateToProducts(context)` helper
+- **Dependency registration**: Updates `app/pubspec.yaml` automatically
+
+The feature will be accessible via:
+
+```dart
+AppRoutes.navigateToProducts(context);  // or
+context.push(AppRoutes.productsPath);
+```
 
 ### Remove a Feature
 
@@ -151,13 +161,18 @@ dart pub global activate --source path .
 
 ## Project Structure
 
-The generated project follows Clean Architecture principles:
+The generated project follows Clean Architecture principles with go_router for navigation:
 
 ```
 my_project/
 ├── packages/
 │   ├── app/                 # Main application
+│   │   └── routes/
+│   │       └── app_router.dart    # GoRouter configuration
 │   ├── core/                # Shared utilities
+│   │   └── routes/
+│   │       ├── app_routes.dart    # Route constants & helpers
+│   │       └── api_routes.dart    # API endpoints
 │   └── features/            # Feature modules
 │       └── feature_name/
 │           ├── data/
@@ -166,6 +181,17 @@ my_project/
 ├── melos.yaml
 └── pubspec.yaml
 ```
+
+## Routing System
+
+This CLI generates code compatible with **go_router** (Flutter's recommended routing solution):
+
+- ✅ Type-safe route definitions in `core/lib/src/routes/app_routes.dart`
+- ✅ Declarative routing in `app/lib/routes/app_router.dart`
+- ✅ Navigation helpers using `context.push()` and `context.go()`
+- ✅ Deep linking support
+- ✅ Authentication guards
+- ✅ Route parameters support
 
 ## Publishing to pub.dev
 

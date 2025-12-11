@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:maloc_cli/utils/logger.dart';
-import 'package:maloc_cli/utils/string_utils.dart';
+import '../utils/logger.dart';
+import '../utils/string_utils.dart';
 
 class RemoveFeatureCommand {
   final String featureName;
@@ -20,9 +20,11 @@ class RemoveFeatureCommand {
 
     if (!melosFile.existsSync() || !packagesDir.existsSync()) {
       Logger.error(
-          '❌ Please run this command from the project root directory!');
+        '❌ Please run this command from the project root directory!',
+      );
       Logger.error(
-          '   (The directory containing melos.yaml and packages/ folder)');
+        '   (The directory containing melos.yaml and packages/ folder)',
+      );
       print('');
       print('Current directory: ${_cyan}$currentDir$_reset');
       print('Expected files: ${_cyan}melos.yaml, packages/$_reset');
@@ -53,7 +55,7 @@ class RemoveFeatureCommand {
     print('${_red}⚠️  WARNING: This will permanently delete:$_reset');
     print('   • Feature directory: features_$snakeName');
     print('   • Route from app_routes.dart');
-    print('   • Route from app_route_generator.dart');
+    print('   • GoRoute from app_router.dart');
     print('   • Dependency from app/pubspec.yaml');
     print('');
     stdout.write('Are you sure you want to continue? (yes/no): ');
@@ -76,10 +78,10 @@ class RemoveFeatureCommand {
     _removeRoutesFromAppRoutes(snakeName, camelName, pascalName);
     Logger.success('Removed routes from app_routes.dart');
 
-    // Remove from app_route_generator.dart
-    Logger.step('Removing from app_route_generator.dart...');
-    _removeFromRouteGenerator(snakeName, pascalName, camelName);
-    Logger.success('Removed from app_route_generator.dart');
+    // Remove from app_router.dart
+    Logger.step('Removing from app_router.dart...');
+    _removeFromAppRouter(snakeName, pascalName, camelName);
+    Logger.success('Removed from app_router.dart');
 
     // Delete feature directory
     Logger.step('Deleting feature directory...');
@@ -97,9 +99,9 @@ class RemoveFeatureCommand {
 ${_green}✨ What was removed:$_reset
    • Feature directory: packages/features_$snakeName
    • Dependency from app/pubspec.yaml
-   • Route constant from app_routes.dart
+   • Route constants from app_routes.dart
    • Navigation helper from app_routes.dart
-   • Route registration from app_route_generator.dart
+   • GoRoute registration from app_router.dart
 
 ${_yellow}⚠️  Don't forget to:$_reset
    1. Remove dependency registrations from app/lib/injection_container.dart
@@ -145,7 +147,10 @@ ${_yellow}⚠️  Don't forget to:$_reset
   }
 
   void _removeRoutesFromAppRoutes(
-      String snakeName, String camelName, String pascalName) {
+    String snakeName,
+    String camelName,
+    String pascalName,
+  ) {
     try {
       final currentDir = Directory.current.path;
       final appRoutesPath =
@@ -159,18 +164,23 @@ ${_yellow}⚠️  Don't forget to:$_reset
 
       String content = appRoutesFile.readAsStringSync();
 
-      // Remove route constant (exact match of what create command generates)
+      // Remove route name constant
       final featureTitle = snakeName
           .split('_')
           .map((w) => w[0].toUpperCase() + w.substring(1))
           .join(' ');
-      final routeConstantPattern =
-          '\n  // $featureTitle Routes\n  static const String $camelName = \'/$snakeName\';\n';
-      content = content.replaceAll(routeConstantPattern, '');
+      final routeNamePattern =
+          '\n  // $featureTitle Routes\n  static const String $camelName = \'$snakeName\';\n';
+      content = content.replaceAll(routeNamePattern, '');
 
-      // Remove navigation helper (exact match of what create command generates)
+      // Remove route path constant
+      final routePathPattern =
+          '  static const String ${camelName}Path = \'/$snakeName\';\n';
+      content = content.replaceAll(routePathPattern, '');
+
+      // Remove navigation helper (go_router pattern)
       final navHelperPattern =
-          '\n  /// Navigate to $snakeName page\n  static Future<void> navigateTo$pascalName(BuildContext context) {\n    return Navigator.pushNamed(context, $camelName);\n  }\n\n';
+          '\n  /// Navigate to $snakeName page\n  static void navigateTo$pascalName(BuildContext context) {\n    context.push(${camelName}Path);\n  }\n';
       content = content.replaceAll(navHelperPattern, '');
 
       appRoutesFile.writeAsStringSync(content);
@@ -179,50 +189,63 @@ ${_yellow}⚠️  Don't forget to:$_reset
     }
   }
 
-  void _removeFromRouteGenerator(
-      String snakeName, String pascalName, String camelName) {
+  void _removeFromAppRouter(
+    String snakeName,
+    String pascalName,
+    String camelName,
+  ) {
     try {
       final currentDir = Directory.current.path;
-      final routeGeneratorPath =
-          '$currentDir/packages/app/lib/routes/app_route_generator.dart';
-      final routeGeneratorFile = File(routeGeneratorPath);
+      final appRouterPath =
+          '$currentDir/packages/app/lib/routes/app_router.dart';
+      final appRouterFile = File(appRouterPath);
 
-      if (!routeGeneratorFile.existsSync()) {
-        Logger.warning('app_route_generator.dart not found');
+      if (!appRouterFile.existsSync()) {
+        Logger.warning('app_router.dart not found');
         return;
       }
 
-      String content = routeGeneratorFile.readAsStringSync();
+      String content = appRouterFile.readAsStringSync();
 
       // Remove import (exact match)
       final importPattern =
           "import 'package:features_$snakeName/features_$snakeName.dart';\n";
       content = content.replaceAll(importPattern, '');
 
-      // Remove switch case (exact match)
-      final switchCasePattern =
-          '\n      case AppRoutes.$camelName:\n        return _createRoute(\n          BlocProvider(\n            create: (_) => getIt<${pascalName}Bloc>(),\n            child: const ${pascalName}Page(),\n          ),\n          settings,\n        );\n';
-      content = content.replaceAll(switchCasePattern, '');
+      // Remove GoRoute registration (exact match of what create command generates)
+      final featureTitle = snakeName
+          .split('_')
+          .map((w) => w[0].toUpperCase() + w.substring(1))
+          .join(' ');
 
-      // Remove route registration (exact match of what create command generates)
-      final registrationPattern = '''
-    
-    // ${pascalName} route
-    AppRouteRegistry.registerRoute(
-      AppRoutes.$camelName,
-      (settings) => MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => getIt<${pascalName}Bloc>(),
-          child: const ${pascalName}Page(),
+      // Try to match the exact pattern with the comment line
+      final goRoutePattern =
+          '''
+        // ==================== $featureTitle Routes ====================
+        GoRoute(
+          path: AppRoutes.${camelName}Path,
+          name: AppRoutes.$camelName,
+          pageBuilder: (context, state) => _buildPageWithTransition(
+            key: state.pageKey,
+            child: BlocProvider(
+              create: (_) => getIt<${pascalName}Bloc>(),
+              child: const ${pascalName}Page(),
+            ),
+          ),
         ),
-        settings: settings,
-      ),
-    );''';
-      content = content.replaceAll(registrationPattern, '');
+''';
 
-      routeGeneratorFile.writeAsStringSync(content);
+      if (content.contains(goRoutePattern)) {
+        content = content.replaceAll(goRoutePattern, '');
+      } else {
+        // Fallback: try without the trailing newline
+        final goRoutePatternAlt = goRoutePattern.trimRight();
+        content = content.replaceAll(goRoutePatternAlt, '');
+      }
+
+      appRouterFile.writeAsStringSync(content);
     } catch (e) {
-      Logger.warning('Error removing from app_route_generator.dart: $e');
+      Logger.warning('Error removing from app_router.dart: $e');
     }
   }
 

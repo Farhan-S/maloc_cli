@@ -1,5 +1,6 @@
 class PageGenerator {
-  static String generate(String snakeName, String pascalName) {
+  static String generate(
+      String snakeName, String pascalName, String camelName) {
     return '''import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/${snakeName}_bloc.dart';
@@ -64,12 +65,12 @@ class ${pascalName}Page extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'ID: \${state.${snakeName}.id}',
+                    'ID: \${state.${camelName}.id}',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Name: \${state.${snakeName}.name}',
+                    'Name: \${state.${camelName}.name}',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
