@@ -53,7 +53,7 @@ class CreateProjectCommand {
         'git',
         [
           'clone',
-          'https://github.com/Farhan-S/flutter-dio-network-config.git',
+          'https://github.com/Farhan-S/flutter_monorepo_clean_architecture.git',
           name,
         ],
       );
