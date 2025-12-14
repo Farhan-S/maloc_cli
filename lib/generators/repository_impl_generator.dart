@@ -16,10 +16,10 @@ class ${pascalName}RepositoryImpl implements ${pascalName}Repository {
   ${pascalName}RepositoryImpl(this.remoteDataSource);
 
   @override
-  Future<Either<ApiException, ${pascalName}Entity>> get${pascalName}(String id) async {
+  Future<Either<ApiException, ${pascalName}Entity>> get$pascalName(String id) async {
     try {
-      final ${camelName} = await remoteDataSource.get${pascalName}(id);
-      return Right(${camelName});
+      final $camelName = await remoteDataSource.get$pascalName(id);
+      return Right($camelName);
     } on ApiException catch (e) {
       return Left(e);
     } catch (e) {
@@ -40,11 +40,11 @@ class ${pascalName}RepositoryImpl implements ${pascalName}Repository {
   }
 
   @override
-  Future<Either<ApiException, ${pascalName}Entity>> create${pascalName}(${pascalName}Entity ${snakeName}) async {
+  Future<Either<ApiException, ${pascalName}Entity>> create$pascalName(${pascalName}Entity $snakeName) async {
     try {
-      final model = ${pascalName}Model.fromEntity(${snakeName});
-      final created${pascalName} = await remoteDataSource.create${pascalName}(model);
-      return Right(created${pascalName});
+      final model = ${pascalName}Model.fromEntity($snakeName);
+      final created$pascalName = await remoteDataSource.create$pascalName(model);
+      return Right(created$pascalName);
     } on ApiException catch (e) {
       return Left(e);
     } catch (e) {
@@ -53,11 +53,11 @@ class ${pascalName}RepositoryImpl implements ${pascalName}Repository {
   }
 
   @override
-  Future<Either<ApiException, ${pascalName}Entity>> update${pascalName}(${pascalName}Entity ${snakeName}) async {
+  Future<Either<ApiException, ${pascalName}Entity>> update$pascalName(${pascalName}Entity $snakeName) async {
     try {
-      final model = ${pascalName}Model.fromEntity(${snakeName});
-      final updated${pascalName} = await remoteDataSource.update${pascalName}(model);
-      return Right(updated${pascalName});
+      final model = ${pascalName}Model.fromEntity($snakeName);
+      final updated$pascalName = await remoteDataSource.update$pascalName(model);
+      return Right(updated$pascalName);
     } on ApiException catch (e) {
       return Left(e);
     } catch (e) {
@@ -66,9 +66,9 @@ class ${pascalName}RepositoryImpl implements ${pascalName}Repository {
   }
 
   @override
-  Future<Either<ApiException, void>> delete${pascalName}(String id) async {
+  Future<Either<ApiException, void>> delete$pascalName(String id) async {
     try {
-      await remoteDataSource.delete${pascalName}(id);
+      await remoteDataSource.delete$pascalName(id);
       return const Right(null);
     } on ApiException catch (e) {
       return Left(e);

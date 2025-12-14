@@ -27,7 +27,7 @@ class RemovePageCommand {
         '   (The directory containing melos.yaml and packages/ folder)',
       );
       print('');
-      print('Current directory: ${_cyan}$currentDir$_reset');
+      print('Current directory: $_cyan$currentDir$_reset');
       print('Expected files: ${_cyan}melos.yaml, packages/$_reset');
       exit(1);
     }
@@ -82,7 +82,7 @@ class RemovePageCommand {
 
     // Ask for confirmation
     print('');
-    print('${_red}⚠️  WARNING: This will permanently delete:$_reset');
+    print('$_red⚠️  WARNING: This will permanently delete:$_reset');
     print('   • Page: ${snakePageName}_page.dart');
     if (hasBloc) {
       print(
@@ -154,7 +154,7 @@ class RemovePageCommand {
       Logger.header('Page Removed Successfully! 🗑️');
 
       print('');
-      print('${_green}✨ What was removed:$_reset');
+      print('$_green✨ What was removed:$_reset');
       print('   • Page: ${snakePageName}_page.dart');
       if (hasBloc) {
         print('   • BLoC: ${snakePageName}_bloc.dart');
@@ -171,7 +171,7 @@ class RemovePageCommand {
             '   • Repository Implementation: ${snakePageName}_repository_impl.dart');
       }
       print('');
-      print('${_green}✨ What was cleaned up automatically:$_reset');
+      print('$_green✨ What was cleaned up automatically:$_reset');
       print('   • Route removed from app_routes.dart');
       print('   • Route removed from app_router.dart');
       if (hasBloc) {

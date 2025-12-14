@@ -15,9 +15,8 @@ class InitProjectCommand {
     final targetDir = Directory(target);
 
     // Get project name from directory name
-    final projectName = targetDir.absolute.path
-        .split(Platform.pathSeparator)
-        .last;
+    final projectName =
+        targetDir.absolute.path.split(Platform.pathSeparator).last;
 
     // Check if directory exists, create if not
     if (!targetDir.existsSync()) {
@@ -101,9 +100,12 @@ class InitProjectCommand {
       Logger.step('Installing dependencies (this may take a while)...');
       final bootstrapFile = File('${targetDir.path}/bootstrap.dart');
       if (bootstrapFile.existsSync()) {
-        final bootstrapResult = await Process.run('dart', [
-          'bootstrap.dart',
-        ], workingDirectory: targetDir.path);
+        final bootstrapResult = await Process.run(
+            'dart',
+            [
+              'bootstrap.dart',
+            ],
+            workingDirectory: targetDir.path);
 
         if (bootstrapResult.exitCode == 0) {
           Logger.success('Dependencies installed');
@@ -121,15 +123,21 @@ class InitProjectCommand {
       // Step 7: Initial git commit (if new repo)
       if (!gitDir.existsSync() || (await _isGitRepoEmpty(targetDir.path))) {
         Logger.step('Creating initial commit...');
-        await Process.run('git', [
-          'add',
-          '.',
-        ], workingDirectory: targetDir.path);
-        await Process.run('git', [
-          'commit',
-          '-m',
-          'Initial commit',
-        ], workingDirectory: targetDir.path);
+        await Process.run(
+            'git',
+            [
+              'add',
+              '.',
+            ],
+            workingDirectory: targetDir.path);
+        await Process.run(
+            'git',
+            [
+              'commit',
+              '-m',
+              'Initial commit',
+            ],
+            workingDirectory: targetDir.path);
         Logger.success('Initial commit created');
       }
 
@@ -276,11 +284,14 @@ ${Logger.green}Happy coding! 🚀${Logger.reset}
   }
 
   Future<bool> _isGitRepoEmpty(String path) async {
-    final result = await Process.run('git', [
-      'rev-list',
-      '--all',
-      '--count',
-    ], workingDirectory: path);
+    final result = await Process.run(
+        'git',
+        [
+          'rev-list',
+          '--all',
+          '--count',
+        ],
+        workingDirectory: path);
     return result.stdout.toString().trim() == '0';
   }
 }

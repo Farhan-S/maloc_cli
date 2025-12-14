@@ -26,7 +26,7 @@ class RemoveFeatureCommand {
         '   (The directory containing melos.yaml and packages/ folder)',
       );
       print('');
-      print('Current directory: ${_cyan}$currentDir$_reset');
+      print('Current directory: $_cyan$currentDir$_reset');
       print('Expected files: ${_cyan}melos.yaml, packages/$_reset');
       exit(1);
     }
@@ -52,7 +52,7 @@ class RemoveFeatureCommand {
 
     // Ask for confirmation
     print('');
-    print('${_red}⚠️  WARNING: This will permanently delete:$_reset');
+    print('$_red⚠️  WARNING: This will permanently delete:$_reset');
     print('   • Feature directory: features_$snakeName');
     print('   • Route from app_routes.dart');
     print('   • GoRoute from app_router.dart');
@@ -96,16 +96,16 @@ class RemoveFeatureCommand {
     Logger.header('Feature Removed Successfully! 🗑️');
 
     print('''
-${_green}✨ What was removed:$_reset
+$_green✨ What was removed:$_reset
    • Feature directory: packages/features_$snakeName
    • Dependency from app/pubspec.yaml
    • Route constants from app_routes.dart
    • Navigation helper from app_routes.dart
    • GoRoute registration from app_router.dart
 
-${_yellow}⚠️  Don't forget to:$_reset
+$_yellow⚠️  Don't forget to:$_reset
    1. Remove dependency registrations from app/lib/injection_container.dart
-   2. Run: ${_cyan}flutter pub get${_reset} in the app package
+   2. Run: ${_cyan}flutter pub get$_reset in the app package
 ''');
   }
 
@@ -219,8 +219,7 @@ ${_yellow}⚠️  Don't forget to:$_reset
           .join(' ');
 
       // Try to match the exact pattern with the comment line
-      final goRoutePattern =
-          '''
+      final goRoutePattern = '''
         // ==================== $featureTitle Routes ====================
         GoRoute(
           path: AppRoutes.${camelName}Path,

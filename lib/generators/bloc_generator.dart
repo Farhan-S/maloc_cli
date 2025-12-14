@@ -1,4 +1,16 @@
+/// Generator for creating BLoC (Business Logic Component) files.
+///
+/// Generates bloc, event, and state files following the flutter_bloc pattern.
 class BlocGenerator {
+  /// Generates BLoC files for a feature.
+  ///
+  /// Parameters:
+  /// - [snakeName]: Feature name in snake_case
+  /// - [pascalName]: Feature name in PascalCase
+  /// - [camelName]: Feature name in camelCase
+  /// - [withData]: If true, generates BLoC with domain layer integration
+  ///
+  /// Returns a map with keys 'bloc', 'event', and 'state' containing generated code.
   static Map<String, String> generate(
       String snakeName, String pascalName, String camelName,
       {bool withData = false}) {
@@ -20,15 +32,15 @@ import '../../domain/usecases/get_${snakeName}_usecase.dart';
 import '${snakeName}_event.dart';
 import '${snakeName}_state.dart';
 
-/// BLoC for managing ${pascalName} state
+/// BLoC for managing $pascalName state
 class ${pascalName}Bloc extends Bloc<${pascalName}Event, ${pascalName}State> {
   final Get${pascalName}UseCase get${pascalName}UseCase;
 
   ${pascalName}Bloc(this.get${pascalName}UseCase) : super(${pascalName}Initial()) {
-    on<Get${pascalName}Event>(_onGet${pascalName});
+    on<Get${pascalName}Event>(_onGet$pascalName);
   }
 
-  Future<void> _onGet${pascalName}(
+  Future<void> _onGet$pascalName(
     Get${pascalName}Event event,
     Emitter<${pascalName}State> emit,
   ) async {
@@ -38,7 +50,7 @@ class ${pascalName}Bloc extends Bloc<${pascalName}Event, ${pascalName}State> {
 
     result.fold(
       (failure) => emit(${pascalName}Error(message: failure.message)),
-      (${camelName}) => emit(${pascalName}Loaded(${camelName}: ${camelName})),
+      ($camelName) => emit(${pascalName}Loaded($camelName: $camelName)),
     );
   }
 }
@@ -48,13 +60,13 @@ class ${pascalName}Bloc extends Bloc<${pascalName}Event, ${pascalName}State> {
 import '${snakeName}_event.dart';
 import '${snakeName}_state.dart';
 
-/// BLoC for managing ${pascalName} state
+/// BLoC for managing $pascalName state
 class ${pascalName}Bloc extends Bloc<${pascalName}Event, ${pascalName}State> {
   ${pascalName}Bloc() : super(${pascalName}Initial()) {
-    on<Get${pascalName}Event>(_onGet${pascalName});
+    on<Get${pascalName}Event>(_onGet$pascalName);
   }
 
-  Future<void> _onGet${pascalName}(
+  Future<void> _onGet$pascalName(
     Get${pascalName}Event event,
     Emitter<${pascalName}State> emit,
   ) async {
@@ -73,7 +85,7 @@ class ${pascalName}Bloc extends Bloc<${pascalName}Event, ${pascalName}State> {
   static String _generateEvent(String snakeName, String pascalName) {
     return '''import 'package:equatable/equatable.dart';
 
-/// Base class for ${pascalName} events
+/// Base class for $pascalName events
 abstract class ${pascalName}Event extends Equatable {
   const ${pascalName}Event();
 
@@ -81,7 +93,7 @@ abstract class ${pascalName}Event extends Equatable {
   List<Object?> get props => [];
 }
 
-/// Event to get ${snakeName} by ID
+/// Event to get $snakeName by ID
 class Get${pascalName}Event extends ${pascalName}Event {
   final String id;
 
@@ -100,7 +112,7 @@ class Get${pascalName}Event extends ${pascalName}Event {
       return '''import 'package:equatable/equatable.dart';
 import '../../domain/entities/${snakeName}_entity.dart';
 
-/// Base class for ${pascalName} states
+/// Base class for $pascalName states
 abstract class ${pascalName}State extends Equatable {
   const ${pascalName}State();
 
@@ -114,14 +126,14 @@ class ${pascalName}Initial extends ${pascalName}State {}
 /// Loading state
 class ${pascalName}Loading extends ${pascalName}State {}
 
-/// Loaded state with ${snakeName} data
+/// Loaded state with $snakeName data
 class ${pascalName}Loaded extends ${pascalName}State {
-  final ${pascalName}Entity ${camelName};
+  final ${pascalName}Entity $camelName;
 
-  const ${pascalName}Loaded({required this.${camelName}});
+  const ${pascalName}Loaded({required this.$camelName});
 
   @override
-  List<Object?> get props => [${camelName}];
+  List<Object?> get props => [$camelName];
 }
 
 /// Error state
@@ -137,7 +149,7 @@ class ${pascalName}Error extends ${pascalName}State {
     } else {
       return '''import 'package:equatable/equatable.dart';
 
-/// Base class for ${pascalName} states
+/// Base class for $pascalName states
 abstract class ${pascalName}State extends Equatable {
   const ${pascalName}State();
 
@@ -151,7 +163,7 @@ class ${pascalName}Initial extends ${pascalName}State {}
 /// Loading state
 class ${pascalName}Loading extends ${pascalName}State {}
 
-/// Loaded state with ${snakeName} data
+/// Loaded state with $snakeName data
 class ${pascalName}Loaded extends ${pascalName}State {
   final String data;
 

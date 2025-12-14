@@ -1,8 +1,19 @@
+/// Generator for creating data model classes.
+///
+/// Generates model classes that extend domain entities and add
+/// JSON serialization capabilities for API communication.
 class ModelGenerator {
+  /// Generates a data model class for the given feature.
+  ///
+  /// Parameters:
+  /// - [snakeName]: Feature name in snake_case
+  /// - [pascalName]: Feature name in PascalCase
+  ///
+  /// Returns a string containing the complete model class code.
   static String generate(String snakeName, String pascalName) {
     return '''import '../../domain/entities/${snakeName}_entity.dart';
 
-/// Data model for ${pascalName}
+/// Data model for $pascalName
 /// Extends ${pascalName}Entity and adds JSON serialization
 class ${pascalName}Model extends ${pascalName}Entity {
   const ${pascalName}Model({

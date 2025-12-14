@@ -13,9 +13,19 @@ import 'package:maloc_cli/generators/usecase_generator.dart';
 import 'package:maloc_cli/utils/logger.dart';
 import 'package:maloc_cli/utils/string_utils.dart';
 
+/// Command to create a new feature module with Clean Architecture layers.
+///
+/// Generates:
+/// - Presentation layer (BLoC, Pages, Widgets)
+/// - Domain layer (Entities, Use Cases, Repository Interface)
+/// - Data layer (Models, Data Sources, Repository Implementation)
+/// - Automatic routing setup
+/// - Dependency registration
 class CreateFeatureCommand {
+  /// The name of the feature to create.
   final String featureName;
 
+  /// Creates a new [CreateFeatureCommand] with the given [featureName].
   CreateFeatureCommand(this.featureName);
 
   Future<void> execute() async {
@@ -34,7 +44,7 @@ class CreateFeatureCommand {
       Logger.error(
           '   (The directory containing melos.yaml and packages/ folder)');
       print('');
-      print('Current directory: ${_cyan}$currentDir$_reset');
+      print('Current directory: $_cyan$currentDir$_reset');
       print('Expected files: ${_cyan}melos.yaml, packages/$_reset');
       exit(1);
     }
@@ -155,7 +165,7 @@ class CreateFeatureCommand {
 Next steps:
 
 1. Register in app/lib/injection_container.dart:
-   ${_cyan}// Data Sources
+   $_cyan// Data Sources
    getIt.registerLazySingleton<${pascalName}RemoteDataSource>(
      () => ${pascalName}RemoteDataSource(getIt<DioClient>()),
    );
@@ -175,14 +185,14 @@ Next steps:
      () => ${pascalName}Bloc(getIt<Get${pascalName}UseCase>()),
    );$_reset
 
-${_green}✨ What was done automatically:$_reset
+$_green✨ What was done automatically:$_reset
    • Created complete Clean Architecture structure
    • Added dependency to app/pubspec.yaml
    • Installed all feature dependencies
    • Registered routes in app_routes.dart
    • Registered GoRoute in app_router.dart
 
-Feature location: ${_green}$featurePath$_reset
+Feature location: $_green$featurePath$_reset
 ''');
   }
 

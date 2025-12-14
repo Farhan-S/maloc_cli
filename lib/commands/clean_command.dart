@@ -2,11 +2,27 @@ import 'dart:io';
 
 import 'package:maloc_cli/utils/logger.dart';
 
+/// Command to clean build artifacts and caches from all packages in a Maloc project.
+///
+/// This command removes:
+/// - `build/` directories
+/// - `.dart_tool/` directories
+/// - Platform-specific build artifacts (Android, iOS, macOS, Linux, Windows, Web)
+/// - Generated plugin files
+/// - Lock files
+///
+/// Similar to running `flutter clean` but for the entire monorepo structure.
 class CleanCommand {
+  /// The target directory path. If null, uses current directory.
   final String? targetPath;
 
+  /// Creates a new [CleanCommand] with optional [targetPath].
   CleanCommand(this.targetPath);
 
+  /// Executes the clean command, removing build artifacts from all packages.
+  ///
+  /// Returns a [Future] that completes when the cleaning is done.
+  /// Exits with code 1 if the target directory doesn't exist or isn't a valid project.
   Future<void> execute() async {
     Logger.header('Clean Maloc Project');
 

@@ -1,6 +1,6 @@
 name: maloc_cli
 description: A CLI tool for scaffolding Flutter projects with Clean Architecture, Melos monorepo setup, and BLoC state management.
-version: 1.0.0
+version: 1.0.1
 repository: https://github.com/Farhan-S/maloc_cli
 homepage: https://github.com/Farhan-S/maloc_cli
 

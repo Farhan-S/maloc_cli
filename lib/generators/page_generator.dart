@@ -1,4 +1,16 @@
+/// Generator for creating Flutter page widgets.
+///
+/// Generates page widgets with optional BLoC integration and data layer support.
 class PageGenerator {
+  /// Generates a Flutter page widget for the given feature.
+  ///
+  /// Parameters:
+  /// - [snakeName]: Feature name in snake_case
+  /// - [pascalName]: Feature name in PascalCase
+  /// - [camelName]: Feature name in camelCase
+  /// - [withData]: If true, generates page with full data layer integration
+  ///
+  /// Returns a string containing the complete page widget code.
   static String generate(String snakeName, String pascalName, String camelName,
       {bool withData = false}) {
     if (withData) {
@@ -16,7 +28,7 @@ import '../bloc/${snakeName}_bloc.dart';
 import '../bloc/${snakeName}_event.dart';
 import '../bloc/${snakeName}_state.dart';
 
-/// ${pascalName} page
+/// $pascalName page
 class ${pascalName}Page extends StatelessWidget {
   const ${pascalName}Page({super.key});
 
@@ -24,7 +36,7 @@ class ${pascalName}Page extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('${pascalName}'),
+        title: const Text('$pascalName'),
       ),
       body: BlocBuilder<${pascalName}Bloc, ${pascalName}State>(
         builder: (context, state) {
@@ -74,12 +86,12 @@ class ${pascalName}Page extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'ID: \${state.${camelName}.id}',
+                    'ID: \${state.$camelName.id}',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Name: \${state.${camelName}.name}',
+                    'Name: \${state.$camelName.name}',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                 ],
@@ -91,7 +103,7 @@ class ${pascalName}Page extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Welcome to ${pascalName} Page'),
+                const Text('Welcome to $pascalName Page'),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
@@ -99,7 +111,7 @@ class ${pascalName}Page extends StatelessWidget {
                       const Get${pascalName}Event('1'),
                     );
                   },
-                  child: const Text('Load ${pascalName}'),
+                  child: const Text('Load $pascalName'),
                 ),
               ],
             ),
@@ -120,7 +132,7 @@ import '../bloc/${snakeName}_bloc.dart';
 import '../bloc/${snakeName}_event.dart';
 import '../bloc/${snakeName}_state.dart';
 
-/// ${pascalName} page
+/// $pascalName page
 class ${pascalName}Page extends StatelessWidget {
   const ${pascalName}Page({super.key});
 
@@ -128,7 +140,7 @@ class ${pascalName}Page extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('${pascalName}'),
+        title: const Text('$pascalName'),
       ),
       body: BlocBuilder<${pascalName}Bloc, ${pascalName}State>(
         builder: (context, state) {
@@ -192,7 +204,7 @@ class ${pascalName}Page extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Welcome to ${pascalName} Page'),
+                const Text('Welcome to $pascalName Page'),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () {
@@ -200,7 +212,7 @@ class ${pascalName}Page extends StatelessWidget {
                       const Get${pascalName}Event('1'),
                     );
                   },
-                  child: const Text('Load ${pascalName}'),
+                  child: const Text('Load $pascalName'),
                 ),
               ],
             ),

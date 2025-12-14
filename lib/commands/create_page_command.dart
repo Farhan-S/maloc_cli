@@ -41,7 +41,7 @@ class CreatePageCommand {
       Logger.error(
           '   (The directory containing melos.yaml and packages/ folder)');
       print('');
-      print('Current directory: ${_cyan}$currentDir$_reset');
+      print('Current directory: $_cyan$currentDir$_reset');
       print('Expected files: ${_cyan}melos.yaml, packages/$_reset');
       exit(1);
     }
@@ -67,11 +67,11 @@ class CreatePageCommand {
           .toList();
 
       if (features.isEmpty) {
-        print('${_yellow}  No features found. Create one with:$_reset');
+        print('$_yellow  No features found. Create one with:$_reset');
         print('  ${_cyan}maloc feature <feature-name>$_reset');
       } else {
         for (var feature in features) {
-          print('${_yellow}  • ${feature.path.split('/').last}$_reset');
+          print('$_yellow  • ${feature.path.split('/').last}$_reset');
         }
       }
       exit(1);
@@ -145,7 +145,7 @@ class CreatePageCommand {
 
       Logger.header('Page Created Successfully! 🎉');
       print('');
-      print('${_green}✨ What was generated:$_reset');
+      print('$_green✨ What was generated:$_reset');
       print('   • Page: ${snakePageName}_page.dart');
       if (withBloc) {
         print('   • BLoC: ${snakePageName}_bloc.dart');
@@ -166,16 +166,16 @@ class CreatePageCommand {
         print('   • Dependency Injection: ${pascalPageName}Bloc registered');
       }
       print('');
-      print('${_green}✨ What was done automatically:$_reset');
+      print('$_green✨ What was done automatically:$_reset');
       print('   • Added route to app_routes.dart');
       print('   • Registered GoRoute in app_router.dart');
       if (withBloc) {
         print('   • Registered dependencies in injection_container.dart');
       }
       print('');
-      print('${_yellow}🚀 Ready to use!$_reset');
+      print('$_yellow🚀 Ready to use!$_reset');
       print(
-          '   Navigate with: ${_cyan}AppRoutes.navigateTo${pascalPageName}(context)$_reset');
+          '   Navigate with: ${_cyan}AppRoutes.navigateTo$pascalPageName(context)$_reset');
       print('');
     } catch (e) {
       Logger.error('Error creating page: $e');
@@ -383,9 +383,8 @@ class ${pascalName}Page extends StatelessWidget {
       }
 
       if (insertPosition != null) {
-        content = content.substring(0, insertPosition) +
-            '$export\n' +
-            content.substring(insertPosition);
+        content =
+            '${content.substring(0, insertPosition)}$export\n${content.substring(insertPosition)}';
       } else {
         // Fallback: add at the end
         if (!content.endsWith('\n')) {
@@ -511,9 +510,8 @@ class ${pascalName}Page extends StatelessWidget {
             content.lastIndexOf("import '../injection_container.dart';");
         if (lastImportIndex != -1) {
           final lineEnd = content.indexOf('\n', lastImportIndex);
-          content = content.substring(0, lineEnd + 1) +
-              '$featureImport\n' +
-              content.substring(lineEnd + 1);
+          content =
+              '${content.substring(0, lineEnd + 1)}$featureImport\n${content.substring(lineEnd + 1)}';
         }
       }
 
@@ -588,7 +586,7 @@ class ${pascalName}Page extends StatelessWidget {
       if (withData) {
         // Register DataSource
         registrations += '''
-  // ${pascalName} Data Sources
+  // $pascalName Data Sources
   getIt.registerLazySingleton<${pascalName}RemoteDataSource>(
     () => ${pascalName}RemoteDataSource(getIt<DioClient>()),
   );
@@ -597,7 +595,7 @@ class ${pascalName}Page extends StatelessWidget {
 
         // Register Repository
         registrations += '''
-  // ${pascalName} Repositories
+  // $pascalName Repositories
   getIt.registerLazySingleton<${pascalName}Repository>(
     () => ${pascalName}RepositoryImpl(getIt<${pascalName}RemoteDataSource>()),
   );
@@ -606,7 +604,7 @@ class ${pascalName}Page extends StatelessWidget {
 
         // Register Use Case
         registrations += '''
-  // ${pascalName} Use Cases
+  // $pascalName Use Cases
   getIt.registerLazySingleton<Get${pascalName}UseCase>(
     () => Get${pascalName}UseCase(getIt<${pascalName}Repository>()),
   );
@@ -615,7 +613,7 @@ class ${pascalName}Page extends StatelessWidget {
 
         // Register BLoC
         registrations += '''
-  // ${pascalName} BLoC
+  // $pascalName BLoC
   getIt.registerFactory<${pascalName}Bloc>(
     () => ${pascalName}Bloc(getIt<Get${pascalName}UseCase>()),
   );
@@ -624,7 +622,7 @@ class ${pascalName}Page extends StatelessWidget {
       } else {
         // Register BLoC only
         registrations += '''
-  // ${pascalName} BLoC
+  // $pascalName BLoC
   getIt.registerFactory<${pascalName}Bloc>(
     () => ${pascalName}Bloc(),
   );
