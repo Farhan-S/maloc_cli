@@ -13,6 +13,7 @@ cd my_awesome_app
 ```
 
 This will:
+
 - Clone the template from GitHub
 - Set up the project structure with Clean Architecture
 - Configure package names
@@ -161,6 +162,7 @@ shopping_app/
 2. **Feature naming**: Use snake_case or camelCase for feature names. The CLI will automatically convert them to the appropriate case for different contexts.
 
 3. **Routing**: After generating features, routes are automatically added to `app_routes.dart` and `app_router.dart`. Use them like:
+
    ```dart
    AppRoutes.navigateToProducts(context);
    // or
