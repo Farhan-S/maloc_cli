@@ -217,22 +217,6 @@ This CLI generates code compatible with **go_router** (Flutter's recommended rou
 - ✅ Authentication guards
 - ✅ Route parameters support
 
-## Publishing to pub.dev
-
-To publish this CLI to pub.dev:
-
-1. Make sure your package is ready:
-
-```bash
-dart pub publish --dry-run
-```
-
-2. Publish to pub.dev:
-
-```bash
-dart pub publish
-```
-
 ## Development
 
 To work on this CLI locally:
