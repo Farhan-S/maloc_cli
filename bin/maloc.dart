@@ -3,6 +3,7 @@
 import 'dart:io';
 
 import 'package:args/args.dart';
+import 'package:maloc_cli/commands/clean_command.dart';
 import 'package:maloc_cli/commands/create_feature_command.dart';
 import 'package:maloc_cli/commands/create_page_command.dart';
 import 'package:maloc_cli/commands/create_project_command.dart';
@@ -26,6 +27,9 @@ void main(List<String> arguments) async {
   // Add pub get command
   final pubParser = ArgParser();
   parser.addCommand('pub', pubParser);
+
+  // Add clean command
+  parser.addCommand('clean');
 
   // Add feature command with options
   final featureParser = ArgParser()
@@ -90,6 +94,10 @@ void main(List<String> arguments) async {
           print('Usage: maloc pub get [path]');
           exit(1);
         }
+        break;
+      case 'clean':
+        final targetPath = command.rest.isNotEmpty ? command.rest.first : null;
+        await CleanCommand(targetPath).execute();
         break;
       case 'feature':
         final featureName = command['name'] ??
@@ -187,6 +195,7 @@ Commands:
   create <project-name>      Create a new Flutter project with Clean Architecture
   init [path]                Initialize template in current or specified directory
   pub get [path]             Install dependencies for all packages in project
+  clean [path]               Clean build artifacts and caches from all packages
   feature <feature-name>     Generate a new feature module in existing project
   page <feature> <page>      Generate a new page in an existing feature
   remove <feature-name>      Remove an existing feature module
@@ -205,6 +214,9 @@ Examples:
 
   # Install all dependencies
   maloc pub get
+
+  # Clean all packages (like flutter clean)
+  maloc clean
 
   # Add a feature to existing project
   maloc feature products

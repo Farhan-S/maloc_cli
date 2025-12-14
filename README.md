@@ -137,6 +137,30 @@ maloc pub get
 
 This will run `dart pub get` for all packages in the project.
 
+### Clean Project
+
+Clean build artifacts and caches from all packages (like `flutter clean` but for the entire monorepo):
+
+```bash
+maloc clean
+```
+
+This removes:
+
+- `build/` directories
+- `.dart_tool/` directories
+- Platform-specific build artifacts (Android, iOS, macOS, Linux, Windows, Web)
+- Generated plugin files (`.flutter-plugins`, `.flutter-plugins-dependencies`)
+- Lock files (`pubspec.lock`, `Podfile.lock`)
+- Shows the amount of disk space freed
+
+Perfect for:
+
+- Resolving dependency conflicts
+- Starting fresh after major updates
+- Freeing disk space
+- Troubleshooting build issues
+
 ## Updating Maloc CLI
 
 ### If installed from pub.dev:
